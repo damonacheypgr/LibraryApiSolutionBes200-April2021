@@ -22,14 +22,16 @@ namespace LibraryApi.Controllers
         private readonly ILogger<BooksController> _logger;
 
         private readonly ILookupBooks _bookLookup;
+        private readonly IBookCommands _bookCommands;
 
-        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILogger<BooksController> logger, ILookupBooks bookLookup)
+        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILogger<BooksController> logger, ILookupBooks bookLookup, IBookCommands bookCommands)
         {
             _context = context;
             _mapper = mapper;
             _config = config;
             _logger = logger;
             _bookLookup = bookLookup;
+            _bookCommands = bookCommands;
         }
 
 
@@ -53,13 +55,18 @@ namespace LibraryApi.Controllers
         [HttpDelete("/books/{id:int}")]
         public async Task<ActionResult> RemoveBookFromInventory(int id)
         {
+#if false
             var book = await _context.AvailableBooks.SingleOrDefaultAsync(b => b.Id == id);
-            if(book != null)
+            if (book != null)
             {
                 //_context.Books.Remove(book);
                 book.IsAvailable = false;
                 await _context.SaveChangesAsync();
-            }
+            } 
+#endif
+
+            await _bookCommands.RemoveBookAsync(id);
+
             return NoContent(); // this is a 204. A success. but there is no entity.
         }
 
@@ -77,10 +84,12 @@ namespace LibraryApi.Controllers
         {
             // 1 Validate it. If Not - return a 400 Bad Request, optionally with some info
             // programmatic, imperative validation
-            if(!ModelState.IsValid)
+#if false
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
+            } 
+#endif
             // 2. Save it in the database
             //    - Turn a PostBookRequest -> Book
             var bookToSave = _mapper.Map<Book>(request);
@@ -101,10 +110,6 @@ namespace LibraryApi.Controllers
         [HttpGet("/books")]
         public async Task<ActionResult<GetBooksSummaryResponse>> GetAllBooks([FromQuery] string genre = null)
         {
-            var response = await _bookLookup.GetBooksByGenreAsync(genre);
-
-
-
 #if false
             var query = _context.AvailableBooks;
             if(genre != null)
@@ -120,6 +125,8 @@ namespace LibraryApi.Controllers
                 GenreFilter = genre
             };
 #endif
+
+            var response = await _bookLookup.GetBooksByGenreAsync(genre);
       
             return Ok(response);
         }
@@ -130,10 +137,14 @@ namespace LibraryApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GetBookDetailsResponse>> GetBookById(int id)
         {
+#if false
             var book = await _context.AvailableBooks
                  .Where(b => b.Id == id)
                  .ProjectTo<GetBookDetailsResponse>(_config)
                  .SingleOrDefaultAsync();
+#endif
+
+            var book = await _bookLookup.GetBooksByIdAsync(id);
 
             if (book == null)
             {
