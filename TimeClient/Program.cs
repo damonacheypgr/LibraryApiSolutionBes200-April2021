@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CacheCow.Client;
+using CacheCow.Client.RedisCacheStore;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -8,8 +10,7 @@ namespace TimeClient
     {
         static async Task Main(string[] args)
         {
-            using var client = new HttpClient();
-
+            using var client = ClientExtensions.CreateClient(new RedisStore("localhost:6379"));
             client.BaseAddress = new Uri("http://localhost:1337");
 
             while (true)
@@ -21,10 +22,8 @@ namespace TimeClient
                 var content = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(content);
 
-                Console.WriteLine("Continue");
-                var q = Console.ReadLine();
-
-                if (q == "q") break;
+                Console.WriteLine("Enter for next get");
+                Console.ReadLine();
             }
         }
     }

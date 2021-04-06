@@ -5,4 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CacheCow.Client.RedisCacheStore" Version="2.8.1" />
+  </ItemGroup>
+
 </Project>
