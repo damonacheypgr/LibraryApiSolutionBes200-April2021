@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using LibraryApi.Services;
 
 namespace LibraryApi.Controllers
 {
@@ -20,15 +21,18 @@ namespace LibraryApi.Controllers
         private readonly MapperConfiguration _config;
         private readonly ILogger<BooksController> _logger;
 
-        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILogger<BooksController> logger)
+        private readonly ILookupBooks _bookLookup;
+
+        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILogger<BooksController> logger, ILookupBooks bookLookup)
         {
             _context = context;
             _mapper = mapper;
             _config = config;
             _logger = logger;
+            _bookLookup = bookLookup;
         }
 
-        
+
 
         [HttpPut("/books/{id:int}/genre")]
         public async Task<ActionResult> UpdateGenre(int id, [FromBody] string genre)
@@ -97,8 +101,11 @@ namespace LibraryApi.Controllers
         [HttpGet("/books")]
         public async Task<ActionResult<GetBooksSummaryResponse>> GetAllBooks([FromQuery] string genre = null)
         {
-            
+            var response = await _bookLookup.GetBooksByGenreAsync(genre);
 
+
+
+#if false
             var query = _context.AvailableBooks;
             if(genre != null)
             {
@@ -112,6 +119,8 @@ namespace LibraryApi.Controllers
                 Data = data,
                 GenreFilter = genre
             };
+#endif
+      
             return Ok(response);
         }
 
