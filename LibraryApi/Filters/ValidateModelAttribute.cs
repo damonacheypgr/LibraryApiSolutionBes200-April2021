@@ -9,11 +9,20 @@ namespace LibraryApi.Filters
 {
     public class ValidateModelAttribute : ActionFilterAttribute
     {
+        public bool SerilazeModelState { get; set; } = true;
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             if (!context.ModelState.IsValid)
             {
-                context.Result = new BadRequestObjectResult(context.ModelState);
+                if (SerilazeModelState)
+                {
+                    context.Result = new BadRequestObjectResult(context.ModelState);
+                }
+                else
+                {
+                    context.Result = new BadRequestResult();
+                }
             }
         }
     }

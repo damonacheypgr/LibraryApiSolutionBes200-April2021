@@ -11,6 +11,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using LibraryApi.Services;
+using LibraryApi.Filters;
 
 namespace LibraryApi.Controllers
 {
@@ -80,6 +81,7 @@ namespace LibraryApi.Controllers
         [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 15)]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ValidateModel(SerilazeModelState = true)]
         public async Task<ActionResult<GetBookDetailsResponse>> AddABook([FromBody] PostBookRequest request)
         {
             // 1 Validate it. If Not - return a 400 Bad Request, optionally with some info
@@ -146,15 +148,7 @@ namespace LibraryApi.Controllers
 
             var book = await _bookLookup.GetBooksByIdAsync(id);
 
-            if (book == null)
-            {
-                _logger.LogWarning("No book with that id!", id);
-                return NotFound(); // 404
-            }
-            else
-            {
-                return Ok(book);
-            }
+            return this.Maybe(book);
         }
     }
 }
