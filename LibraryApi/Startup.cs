@@ -1,23 +1,18 @@
 using AutoMapper;
 using LibraryApi.AutomapperProfiles;
-using LibraryApi.Controllers;
 using LibraryApi.Domain;
 using LibraryApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace LibraryApi
 {
@@ -34,6 +29,7 @@ namespace LibraryApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IReservationLookups, EfReservationsLookup>();
+            services.AddScoped<IReservationsCommands, EfReservationsLookup>();
 
             services.AddDistributedRedisCache(options =>
             {
@@ -44,6 +40,7 @@ namespace LibraryApi
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
             
@@ -78,6 +75,7 @@ namespace LibraryApi
             var mapperConfig = new MapperConfiguration(options =>
             {
                 options.AddProfile(new BooksProfile());
+                options.AddProfile(new ReservationsProfile());
             });
 
             var mapper = mapperConfig.CreateMapper();

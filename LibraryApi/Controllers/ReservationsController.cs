@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using LibraryApi.Filters;
+using LibraryApi.Models.Reservations;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace LibraryApi.Controllers
@@ -9,13 +8,24 @@ namespace LibraryApi.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly IReservationLookups _reservationLookups;
+        private readonly IReservationsCommands _reservationCommands;
 
-        public ReservationsController(IReservationLookups reservationLookups)
+        public ReservationsController(IReservationLookups reservationLookups, IReservationsCommands reservationCommands)
         {
             _reservationLookups = reservationLookups;
+            _reservationCommands = reservationCommands;
         }
 
         // POST
+        [HttpPost("/reservations")]
+        [ValidateModel]
+        public async Task<ActionResult> AddAReservation([FromBody] PostReservationRequest request)
+        {
+            var response = await _reservationCommands.AddReservationAsync(request);
+
+            return CreatedAtRoute("reservations#getbyid", new { Id = response.Id }, response);
+        }
+
         // GET /{id}
         [HttpGet("/reservations/{id:int}", Name = "reservations#getbyid")]
         public async Task<ActionResult> GetReservationById(int id)
