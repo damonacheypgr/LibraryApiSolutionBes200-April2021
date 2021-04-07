@@ -35,7 +35,7 @@ namespace LibraryApi.Services
                 {
                     Name = "Bob",
                     Email = "Bob@None.Com",
-                    Until = DateTime.Today.AddDays(7),
+                    Until = DateTime.Now.AddDays(7),
                 };
 
                 var options = new DistributedCacheEntryOptions()
