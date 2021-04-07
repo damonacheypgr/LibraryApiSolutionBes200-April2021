@@ -20,7 +20,17 @@ namespace LibraryApi.Services
 
         public async Task<OnCallDeveloperResponse> GetOnCallDeveloperAsync()
         {
-            var cachedResponse = await _cache.GetAsync("oncall");
+            var cachedResponse = default(byte[]);
+            try
+            {
+                cachedResponse = await _cache.GetAsync("oncall");
+
+            }
+            catch (Exception)
+            {
+
+                return await GetRealData();
+            }
 
             if (cachedResponse != null)
             {
@@ -31,12 +41,7 @@ namespace LibraryApi.Services
             }
             else
             {
-                var dev = new OnCallDeveloperResponse
-                {
-                    Name = "Bob",
-                    Email = "Bob@None.Com",
-                    Until = DateTime.Now.AddDays(7),
-                };
+                OnCallDeveloperResponse dev = await GetRealData();
 
                 var options = new DistributedCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromSeconds(15));
@@ -47,6 +52,18 @@ namespace LibraryApi.Services
 
                 return dev;
             }
+        }
+
+        private async Task<OnCallDeveloperResponse> GetRealData()
+        {
+            await Task.Delay(TimeSpan.FromSeconds(3));
+
+            return new OnCallDeveloperResponse
+            {
+                Name = "Bob",
+                Email = "Bob@None.Com",
+                Until = DateTime.Now.AddDays(7),
+            };
         }
     }
 }
