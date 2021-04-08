@@ -47,8 +47,32 @@ namespace LibraryApi.Controllers
 
         // GET /ready
         // POST /ready
+        [HttpPost("/reservations/ready")]
+        public async Task<ActionResult> PutReservationInReadyBucket([FromBody] GetReservationSummaryResponseItem item)
+        {
+            if (await _reservationCommands.MarkReady(item))
+            {
+                return Accepted();
+            }
+            else
+            {
+                return BadRequest("No such reservation");
+            }
+        }
 
         // GET /denied
         // POST /denied
+        [HttpPost("/reservations/ready")]
+        public async Task<ActionResult> PutReservationInDeniedBucket([FromBody] GetReservationSummaryResponseItem item)
+        {
+            if (await _reservationCommands.MarkDenied(item))
+            {
+                return Accepted();
+            }
+            else
+            {
+                return BadRequest("No such reservation");
+            }
+        }
     }
 }
