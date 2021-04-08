@@ -6,10 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="docker-compose.yml" />
     <None Remove="Dockerfile" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="docker-compose.yml" />
     <Compile Include="Dockerfile" />
   </ItemGroup>
 
