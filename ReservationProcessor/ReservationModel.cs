@@ -10,7 +10,7 @@ namespace ReservationProcessor
     {
         public int Id { get; set; }
         public string For { get; set; }
-        public string BooksId { get; set; }
+        public string BooksIds { get; set; }
         public string Status { get; set; }
 
     }

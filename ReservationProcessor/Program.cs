@@ -21,6 +21,11 @@ namespace ReservationProcessor
                     {
                         var rabbitConfig = hostContext.Configuration.GetSection("Rabbit");
                         services.Configure<RabbitOptions>(rabbitConfig);
+                        
+                        services.AddHttpClient(); // anything can put HttpClient on the constructor.
+                        services.AddHttpClient("reservationsClient");
+                        services.AddHttpClient<ReservationHttpService>();
+                        
                         services.AddHostedService<ReservationListener>();
                     });
     }

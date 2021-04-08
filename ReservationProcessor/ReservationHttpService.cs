@@ -18,7 +18,7 @@ namespace ReservationProcessor
         {
             client.BaseAddress = new Uri(config.GetValue<string>("apiUrl"));
             client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("User-Agent", "");
+            client.DefaultRequestHeaders.Add("User-Agent", "ReservationProcessor");
             _client = client;
         }
 
